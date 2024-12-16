@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Edit Album</title>
+<script src="res-edit/edit.js" defer></script>
+</head><body>
+<fieldset id="fieldset-add"><legend>Add from files</legend>
+<p><label>Files: <input id="file-input" type="file" multiple></label></p>
+<p><label><input id="file-ignore" type="checkbox" checked> Ignore files that already exist</label></p>
+<fieldset><legend>Default data</legend>
+<input id="file-default-type" type="hidden">
+<p><label>Folder: <input id="file-default-path"></label></p>
+<input id="file-default-poster" type="hidden">
+<input id="file-default-thumb" type="hidden">
+<input id="file-default-w" type="hidden">
+<input id="file-default-h" type="hidden">
+<input id="file-default-dur" type="hidden">
+<input id="file-default-size" type="hidden">
+<p><label>Title: <input id="file-default-title"></label></p>
+<p><label>Description (HTML): <textarea id="file-default-desc"></textarea></p>
+<p><label>Date: <input id="file-default-date"></label></p>
+<p><label>Place: <input id="file-default-place"></label></p>
+<p><label>Author: <input id="file-default-author"></label></p>
+<p><label>Camera: <input id="file-default-camera"></label></p>
+<p><label>Stars (1–5): <input id="file-default-stars"></label></p>
+<p><label>Tags: <textarea id="file-default-tags"></textarea></p>
+<p><label>Override (JSON with path as key): <textarea id="file-default-override"></textarea></p>
+<p><small>E.g.: <code>exiftool -d "%Y-%m-%dT%H:%M:%S" -p '"$filename": {"date": "$dateTimeOriginal"},' -q -f -m *.jpg</code></small></p>
+</fieldset>
+<p><button id="file-add-all">Add all at once</button> <button id="file-add-interactive">Add one by one</button></p>
+</fieldset>
+<fieldset id="fieldset-single" hidden><legend>Add file</legend>
+<p><label>Path: <input id="file-single-path" readonly></label></p>
+<p><img id="file-single-thumb-img" src=""></p>
+<input id="file-single-thumb" type="hidden">
+<input id="file-single-w" type="hidden">
+<input id="file-single-h" type="hidden">
+<input id="file-single-dur" type="hidden">
+<input id="file-single-size" type="hidden">
+<input id="file-single-type" type="hidden">
+<input id="file-single-poster" type="hidden">
+<p><label>Title: <input id="file-single-title"></label></p>
+<p><label>Description (HTML): <textarea id="file-single-desc"></textarea></p>
+<p><label>Date: <input id="file-single-date"></label></p>
+<p><label>Place: <input id="file-single-place"></label></p>
+<p><label>Author: <input id="file-single-author"></label></p>
+<p><label>Camera: <input id="file-single-camera"></label></p>
+<p><label>Stars (1–5): <input id="file-single-stars"></label></p>
+<p><label>Tags: <textarea id="file-single-tags"></textarea></p>
+<p><button id="file-add-single">Add</button> <button id="file-add-skip">Skip</button> <button id="file-add-finish">Skip all</button></p>
+</fieldset>
+<pre id="output"></pre>
+</body></html>
