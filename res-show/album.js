@@ -209,6 +209,10 @@ function exitFolder (dir) {
 	}
 }
 
+function markSavedUnsaved (unsaved) {
+	document.getElementById('button-export').className = unsaved ? 'unsaved' : '';
+}
+
 function showEditPopup () {
 	var li = getCurrentItem(), index, wasBig;
 	if (!li) {
@@ -217,7 +221,7 @@ function showEditPopup () {
 				addItems(data);
 				updatePage();
 				util.popup.destroy('filter'); //there may be new values
-				//TODO mark as unsaved
+				markSavedUnsaved(true);
 			} : null);
 		});
 		return;
@@ -237,7 +241,7 @@ function showEditPopup () {
 					makeBig();
 				}
 			}
-			//TODO mark as unsaved
+			markSavedUnsaved(true);
 		} else {
 			scrollIntoViewIfNeeded(li);
 		}
@@ -264,7 +268,7 @@ function showExportPopup () {
 	edit.openExportPopup(currentState.data, function () {
 		var li;
 		edit.closeExportPopup();
-		//TODO mark as saved
+		markSavedUnsaved(false);
 		li = getCurrentItem();
 		if (li) {
 			scrollIntoViewIfNeeded(li);
@@ -298,7 +302,7 @@ function toggleFullscreen () {
 	}
 }
 
-function handleLiClick (li) {
+function handleLiClick (li, hasControls) {
 	if (li.dataset.type === 'separator') {
 		return;
 	}
@@ -312,6 +316,9 @@ function handleLiClick (li) {
 		return;
 	}
 	if (li.className === 'big') {
+		if (hasControls) {
+			return;
+		}
 		li.className = 'selected';
 		showThumb(li);
 		scrollIntoViewIfNeeded(li);
@@ -332,11 +339,11 @@ function handleKey (e) {
 		unselect();
 		done = true;
 		break;
-	case 'ArrowRight': case 'ArrowDown':
+	case 'ArrowRight':
 		selectNext(1);
 		done = true;
 		break;
-	case 'ArrowLeft': case 'ArrowUp':
+	case 'ArrowLeft':
 		selectNext(-1);
 		done = true;
 		break;
@@ -369,6 +376,37 @@ function getParent (el, tag) {
 	return el;
 }
 
+function handleAnnotation (e) {
+	var el;
+
+	el = document.querySelector('.annotation-list .current');
+	if (el) {
+		el.className = '';
+	}
+
+	el = getParent(e.target, 'g');
+	while (el && el.className.animVal !== 'annotation') {
+		el = getParent(el.parentElement, 'g');
+	}
+	if (el && getParent(el, 'LI').className) {
+		document.querySelector('.annotation-list [data-annotation-index="' + el.getAttribute('data-annotation-index') + '"]').className = 'current';
+	}
+}
+
+function handleAnnotationList (e) {
+	var el;
+
+	el = document.querySelector('.annotation.current');
+	if (el) {
+		el.setAttribute('class', 'annotation');
+	}
+
+	el = getParent(e.target, 'LI');
+	if (el && el.parentElement.className === 'annotation-list') {
+		document.querySelector('.annotation[data-annotation-index="' + el.getAttribute('data-annotation-index') + '"]').setAttribute('class', 'annotation current');
+	}
+}
+
 function initButtons () {
 	var button;
 	button = document.getElementById('button-edit');
@@ -390,9 +428,10 @@ function initButtons () {
 
 function initEvents (container) {
 	container.addEventListener('click', function (e) {
-		var el = getParent(e.target, 'LI');
+		var el;
+		el = getParent(e.target, 'LI');
 		if (el) {
-			handleLiClick(el);
+			handleLiClick(el, e.target.controls);
 		} else {
 			el = getParent(e.target, 'DIV');
 			if (el && el.className === 'folder-up') {
@@ -403,6 +442,10 @@ function initEvents (container) {
 		}
 	});
 	document.addEventListener('keydown', handleKey);
+	document.addEventListener('mousemove', function (e) {
+		handleAnnotation(e);
+		handleAnnotationList(e);
+	});
 	initButtons();
 }
 

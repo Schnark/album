@@ -88,6 +88,7 @@ function buildAddForm () {
 		'<option value="folder">' + l10n.get('addTypeFolder') + '</option>',
 		'</select></label></p>',
 		'<p><label>' + l10n.get('addFiles') + '<input name="files" type="file" multiple></label></p>',
+		'<p><label>' + l10n.get('addPath') + '<input name="path"></label></p>',
 		buildMainInputs(),
 		'<p>',
 		'<button>' + l10n.get('addApply') + '</button>',
@@ -116,6 +117,7 @@ function initAddPopup () {
 	function onTypeChange () {
 		var type = form.querySelector('[name="type"]').value;
 		form.querySelector('[name="files"]').disabled = type !== 'files';
+		form.querySelector('[name="path"]').disabled = (type !== 'files' && type !== 'folder');
 		form.querySelector('[name="title"]').disabled = type === 'separator';
 		form.querySelector('[name="desc"]').disabled = type === 'separator';
 		form.querySelector('[name="date"]').disabled = type === 'separator';
@@ -215,23 +217,32 @@ function formatDate (date) {
 		formatTimezone(date.getTimezoneOffset());
 }
 
-function getSizeAndThumb (file, callback) {
+function getThumb (img) {
 	var THUMB_SIZE = 256,
-		url = URL.createObjectURL(file),
-		img = new Image();
-	img.onload = function () {
-		var canvas = document.createElement('canvas'), w, h, s;
-		s = Math.min(1, THUMB_SIZE / img.width, THUMB_SIZE / img.height);
-		w = Math.round(s * img.width);
-		h = Math.round(s * img.height);
-		canvas.width = w;
-		canvas.height = h;
-		canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+		canvas = document.createElement('canvas'), w, h, s;
+	s = Math.min(1, THUMB_SIZE / img.width, THUMB_SIZE / img.height);
+	w = Math.round(s * img.width);
+	h = Math.round(s * img.height);
+	canvas.width = w;
+	canvas.height = h;
+	canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+	return canvas.toDataURL('image/jpeg', 0.8);
+}
+
+function getSizeAndThumb (file, type, callback) {
+	var url = URL.createObjectURL(file),
+		img = document.createElement(type === 'image' ? 'img' : type);
+	img[type === 'image' ? 'onload' : 'onloadeddata'] = function () {
+		var w = img.videoWidth || img.width,
+			h = img.videoHeight || img.height,
+			duration = img.duration,
+			//we could create a thumb for videos, too, but onloadeddata seems not to work for this
+			thumb = type === 'image' ? getThumb(img) : '';
 		URL.revokeObjectURL(url);
-		callback(canvas.toDataURL('image/jpeg', 0.8), img.width, img.height);
+		callback(thumb, w, h, duration);
 	};
 	img.onerror = function () {
-		callback('', 0, 0);
+		callback('', 0, 0, 0);
 	};
 	img.src = url;
 }
@@ -239,7 +250,7 @@ function getSizeAndThumb (file, callback) {
 function dataFromFile (file, defaultData, callback) {
 	var data = {
 		type: getType(file.type || '', file.name),
-		path: file.name,
+		path: defaultData.path + file.name,
 		size: file.size,
 		title: defaultData.title,
 		desc: defaultData.desc,
@@ -250,11 +261,19 @@ function dataFromFile (file, defaultData, callback) {
 		stars: defaultData.stars,
 		tags: defaultData.tags
 	};
-	if (data.type === 'image') {
-		getSizeAndThumb(file, function (thumb, w, h) {
-			data.thumb = thumb;
+	if (data.type === 'image' || data.type === 'audio' || data.type === 'video') {
+		getSizeAndThumb(file, data.type, function (thumb, w, h, duration) {
+			if (duration && !w && !h) {
+				data.type = 'audio';
+			}
+			if (data.type === 'video') {
+				data.poster = thumb;
+			} else {
+				data.thumb = thumb;
+			}
 			data.w = w;
 			data.h = h;
+			data.dur = isFinite(duration) ? Math.round(duration) : 0;
 			callback(data);
 		});
 	} else {
@@ -285,6 +304,12 @@ function closeAddPopup (callback) {
 	}
 	form = div.getElementsByTagName('form')[0];
 	data = util.serializeForm(form);
+	if (data.path.charAt(data.path.length - 1) !== '/') {
+		data.path += '/';
+	}
+	if (data.path.charAt(0) === '/') {
+		data.path = data.path.slice(1);
+	}
 	data.tags = data.tags.split('\n').filter(function (tag) {
 		return tag;
 	});
@@ -324,7 +349,7 @@ function buildExportForm () {
 }
 
 function initExportPopup () {
-	var div = util.popup.init('edit', buildExportForm()),
+	var div = util.popup.init('export', buildExportForm()),
 		form = div.getElementsByTagName('form')[0];
 
 	function onSubmit (e) {

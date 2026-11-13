@@ -47,7 +47,7 @@ The following attributes are possible for images, videos, audios and other files
 * `"type"` (mandatory): `"image"`, `"video"`, `"audio"` or `"other"`
 * `"path"` (mandatory): path to the file, relative to the base path (or as `data:`-URI)
 * `"poster"`: for videos, path to a poster image
-* `"thumb"`: for images and videos, path to a thumbnail, should be a `data:`-URI
+* `"thumb"`: for images, videos and other files, path to a thumbnail, should be a `data:`-URI
 * `"size"`: file size in bytes
 * `"w"`, `"h"`: width and height of the file in pixels (where applicable)
 * `"dur"`: duration of the file in seconds (where applicable)

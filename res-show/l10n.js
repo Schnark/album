@@ -22,6 +22,7 @@ var data = {
 		],
 		timezone: {'+00:00': 'UTC', '+01:00': 'MEZ', '+02:00': 'MESZ'},
 
+		decimalSep: ',',
 		durUnits: ['s', 'min', 'h'],
 		sizeUnits: ['B', 'KB', 'MB', 'GB'],
 
@@ -43,10 +44,12 @@ var data = {
 			other: 'Gerät: %c'
 		},
 
+		annotations: 'Anmerkungen',
+
 		album: 'Album',
 		albumTitle: 'Album – %t',
 
-		folderUp: 'Zum übergeordneten Ordner wechseln',
+		folderUp: '← Zum übergeordneten Ordner wechseln',
 
 		editTooltip: 'Bearbeiten [F2]',
 		filterTooltip: 'Filtern [F3]',
@@ -101,6 +104,7 @@ var data = {
 		addTypeSeparator: 'Trennlinie',
 		addTypeFolder: 'Ordner',
 		addFiles: 'Dateien: ',
+		addPath: 'Ordner-Pfad: ',
 		addApply: 'Hinzufügen',
 		addCancel: 'Abbrechen',
 		addWait: 'Bitte warten …',
@@ -133,6 +137,7 @@ var data = {
 		//to allow suffixes like [Europe/Berlin] to the timestamp, but
 		//it doesn't seem worth at this point.
 
+		decimalSep: '.',
 		durUnits: ['s', 'min', 'h'],
 		sizeUnits: ['B', 'KB', 'MB', 'GB'],
 
@@ -154,10 +159,12 @@ var data = {
 			other: 'Device: %c'
 		},
 
+		annotations: 'Annotations',
+
 		album: 'Album',
 		albumTitle: 'Album – %t',
 
-		folderUp: 'Go up to folder',
+		folderUp: '← Go up to folder',
 
 		editTooltip: 'Edit [F2]',
 		filterTooltip: 'Filter [F3]',
@@ -212,6 +219,7 @@ var data = {
 		addTypeSeparator: 'Separator',
 		addTypeFolder: 'Folder',
 		addFiles: 'Files: ',
+		addPath: 'Folder path: ',
 		addApply: 'Add',
 		addCancel: 'Cancel',
 		addWait: 'Please wait …',
@@ -346,7 +354,7 @@ function formatSize (size) {
 		unit++;
 		size /= 1024;
 	}
-	size = Math.round(size * 10) / 10;
+	size = String(Math.round(size * 10) / 10).replace(/\./, get('decimalSep'));
 	return size + '&nbsp;' + get('sizeUnits')[unit];
 }
 

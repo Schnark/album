@@ -107,7 +107,15 @@ function formatItem (data, index, base) {
 		break;
 	case 'other':
 		attr = {};
-		attr.src = src;
+		if (data.thumb) {
+			thumb = util.buildPath(base, data.thumb);
+			attr['data-attr'] = 'src';
+			attr['data-full'] = src;
+			attr['data-thumb'] = thumb;
+			attr.src = thumb;
+		} else {
+			attr.src = src;
+		}
 		if (data.w && data.h) {
 			attr.width = data.w;
 			attr.height = data.h;
@@ -260,6 +268,16 @@ function formatTags (tags) {
 	}).join('') + '</ul>';
 }
 
+function formatAnnotationList (annotations) {
+	if (!annotations) {
+		return '';
+	}
+	return '<h3>' + l10n.get('annotations') + '</h3><ul class="annotation-list">' +
+		Object.keys(annotations).map(function (annotation, i) {
+			return '<li data-annotation-index="' + i + '"><span>' + util.escapeHtml(annotation) + '</span></li>';
+		}).join('') + '</ul>';
+}
+
 function formatInfo (data, base) {
 	return [
 		formatTitle(data.title),
@@ -268,7 +286,8 @@ function formatInfo (data, base) {
 		formatDatePlace(data.date, data.place),
 		formatAuthorCamera(data.type, data.author, data.camera),
 		formatStars(data.stars),
-		formatTags(data.tags)
+		formatTags(data.tags),
+		formatAnnotationList(data.annotations)
 	].join('');
 }
 

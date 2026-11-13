@@ -106,18 +106,14 @@ function getKey (e) {
 		return {
 			Esc: 'Escape',
 			Left: 'ArrowLeft',
-			Up: 'ArrowUp',
-			Right: 'ArrowRight',
-			Down: 'ArrowDown'
+			Right: 'ArrowRight'
 		}[e.key] || e.key;
 	}
 	return {
 		13: 'Enter',
 		27: 'Escape',
 		37: 'ArrowLeft',
-		38: 'ArrowUp',
 		39: 'ArrowRight',
-		40: 'ArrowDown',
 		113: 'F2',
 		114: 'F3',
 		115: 'F4',
